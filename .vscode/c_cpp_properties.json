@@ -3,7 +3,7 @@
     {
       "name": "ESP-IDF",
       "compilerPath": "",
-      "compileCommands": "/home/andjelko/Documents/test/build/compile_commands.json",
+      "compileCommands": "/home/andjelko/Documents/Robotika/ZEMO_SIMA/SIMA/build/compile_commands.json",
       "intelliSenseMode": "gcc-x86",
       "includePath": [
         "${workspaceFolder}/**"

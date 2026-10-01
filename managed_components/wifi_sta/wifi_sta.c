@@ -164,9 +164,9 @@ static void on_ip_event(void *arg,
       ip_event_got_ip_t *event_ip = (ip_event_got_ip_t *) event_data;
       esp_netif_ip_info_t *ip_info = &event_ip->ip_info;
       ESP_LOGI(TAG, "WiFi IPv4 address obtained");
-      ESP_LOGI(TAG, " IP address: ", IPSTR, IP2STR(&ip_info->ip));
-      ESP_LOGI(TAG, " Netmask: ", IPSTR, IP2STR(&ip_info->netmask));
-      ESP_LOGI(TAG, " Gateway: ", IPSTR, IP2STR(&ip_info->gw));
+      ESP_LOGI(TAG, " IP address: " IPSTR, IP2STR(&ip_info->ip));
+      ESP_LOGI(TAG, " Netmask: " IPSTR, IP2STR(&ip_info->netmask));
+      ESP_LOGI(TAG, " Gateway: " IPSTR, IP2STR(&ip_info->gw));
 
       break;
 #endif
@@ -567,6 +567,15 @@ esp_err_t wifi_sta_stop(void)
     ESP_LOGI(TAG, "WiFi already disconnected");
   } else if (esp_ret != ESP_OK) {
     ESP_LOGE(TAG, "Error (%d): Failed to disconnect from WiFi", esp_ret);
+    return ESP_FAIL;
+  }
+
+  // (s8.2) Stop the WiFi driver
+  esp_ret = esp_wifi_stop();
+  if (esp_ret == ESP_ERR_WIFI_NOT_INIT) {
+    ESP_LOGI(TAG, "WiFi driver already stopped");
+  } else if (esp_ret != ESP_OK) {
+    ESP_LOGE(TAG, "Error (%d): Failed to stop WiFi driver", esp_ret);
     return ESP_FAIL;
   }
 

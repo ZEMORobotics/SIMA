@@ -4101,12 +4101,43 @@ CONFIG_COAP_INTERNAL_MEM_ALLOC=y
 #
 # WiFi STA Configuration
 #
+CONFIG_WIFI_STA_CONNECT=y
 # default:
-# CONFIG_WIFI_STA_CONNECT is not set
+CONFIG_WIFI_STA_CONNECT_IPV4=y
+# default:
+# CONFIG_WIFI_STA_CONNECT_IP6 is not set
+# default:
+# CONFIG_WIFI_STA_CONNECT_UNSPECIFIED is not set
+# default:
+# CONFIG_WIFI_STA_AUTH_OPEN is not set
+# default:
+# CONFIG_WIFI_STA_AUTH_WEP is not set
+# default:
+# CONFIG_WIFI_STA_AUTH_WPA_PSK is not set
+# default:
+CONFIG_WIFI_STA_AUTH_WPA2_PSK=y
+# default:
+# CONFIG_WIFI_STA_AUTH_WPA_WPA2_PSK is not set
+# default:
+# CONFIG_WIFI_STA_AUTH_WPA3_PSK is not set
+# default:
+# CONFIG_WIFI_STA_AUTH_WPA2_WPA3_PSK is not set
+# default:
+# CONFIG_WIFI_STA_AUTH_WAPI_PSK is not set
+CONFIG_WIFI_STA_SSID="Isa 5ghz"
+CONFIG_WIFI_STA_PASSWORD="12345678"
+# default:
+# CONFIG_WIFI_STA_WPA3_SAE_PWE_HUNT_AND_PECK is not set
+# default:
+# CONFIG_WIFI_STA_WPA3_SAE_PWE_H2E is not set
+# default:
+CONFIG_WIFI_STA_WPA3_SAE_PWE_BOTH=y
+# default:
+CONFIG_WIFI_STA_WPA3_PASSWORD_ID=""
+CONFIG_WIFI_STA_AUTO_RECONNECT=y
 # end of WiFi STA Configuration
 # end of Component config
 
-# default:
 # CONFIG_IDF_EXPERIMENTAL_FEATURES is not set
 
 # Deprecated options for backward compatibility

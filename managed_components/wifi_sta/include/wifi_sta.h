@@ -37,7 +37,7 @@ esp_err_t wifi_sta_init(EventGroupHandle_t event_group);
  * - ESP_OK on success
  * - Other errors on failure. See esp_err.h for error codes.
  */
-esp_err_t wifi_sta_top(void);
+esp_err_t wifi_sta_stop(void);
 
 /**
  * @brief Attempt to reconnect to WiFi

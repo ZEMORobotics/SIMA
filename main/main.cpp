@@ -476,18 +476,6 @@ clean_up:
     ESP_LOGI(TAG, "Finished");
     vTaskDelete(NULL);
 }
-
-esp_err_t example_connect()
-{
-  wifi_init_config_t zemo_wifi_config = WIFI_INIT_CONFIG_DEFAULT();
-
-  ESP_ERROR_CHECK(esp_wifi_init(&zemo_wifi_config));
-  ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-  ESP_ERROR_CHECK(esp_wifi_start());
-  ESP_ERROR_CHECK(esp_wifi_connect());
-
-  return ESP_OK;
-}
  
 extern "C" {
   void app_main(void);
@@ -508,11 +496,6 @@ void app_main(void)
         abort();
     }
 
-
-    /* This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
-     * Read "Establishing Wi-Fi or Ethernet Connection" section in
-     * examples/protocols/README.md for more information about this function.
-     */
     wifi_sta_init(network_event_group);
 
     // Wait for network to connect
@@ -546,18 +529,46 @@ void app_main(void)
         ESP_LOGE(TAGW, "Failed to obtain IP address");
     }
 
-    xTaskCreate(coap_example_client, "coap", 8 * 1024, NULL, 5, NULL);
+    //xTaskCreate(coap_example_client, "coap", 8 * 1024, NULL, 5, NULL);
+
+    int8_t test_reconnect = 80;
 
     while (1)
     {
       if (network_event_bits & WIFI_STA_CONNECTED_BIT) {
-        ESP_LOGI(TAGW, "Still connected to WiFi network");
+        ESP_LOGI(TAGW, "Still connected to WiFi network, %x", network_event_bits);
+        network_event_bits = xEventGroupGetBits(network_event_group);
       } else {
-        ESP_LOGE(TAGW, "Lost connection to the network");
-        abort();
+        ESP_LOGE(TAGW, "Lost connection to the network, %x", network_event_bits);
+        esp_wifi_connect();
+        network_event_bits = xEventGroupGetBits(network_event_group);
       }
-
       vTaskDelay(sleep_time_ms / portTICK_PERIOD_MS);
+
+      /*
+      --test_reconnect;
+      if (test_reconnect == 40) {
+        wifi_sta_stop();
+        network_event_bits = xEventGroupGetBits(network_event_group);
+      }
+      
+      if (test_reconnect <= 0) {
+        wifi_sta_init(NULL);
+        network_event_bits = xEventGroupWaitBits(network_event_group,
+                                             WIFI_STA_CONNECTED_BIT,
+                                             pdFALSE,
+                                             pdTRUE,
+                                             pdMS_TO_TICKS(connection_timeout_ms));
+        ESP_LOGI(TAGW, "Waiting for IP address...");
+        network_event_bits = xEventGroupWaitBits(network_event_group,
+                                             WIFI_STA_IPV4_OBTAINED_BIT |
+                                                WIFI_STA_IPV6_OBTAINED_BIT,
+                                             pdFALSE,
+                                             pdFALSE,
+                                             pdMS_TO_TICKS(connection_timeout_ms));
+
+        test_reconnect = 80;
+      }*/
     }
     
 }
