@@ -123,7 +123,8 @@ static void on_wifi_event(void *arg,
       xEventGroupClearBits(s_wifi_event_group, WIFI_STA_CONNECTED_BIT);
 #if CONFIG_WIFI_STA_AUTO_RECONNECT
       ESP_LOGI(TAG, "Attempting to reconnect...");
-      wifi_sta_reconnect();
+      //wifi_sta_reconnect();
+      esp_wifi_connect();
 #endif
 
       break;

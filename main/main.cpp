@@ -539,8 +539,7 @@ void app_main(void)
         ESP_LOGI(TAGW, "Still connected to WiFi network, %x", network_event_bits);
         network_event_bits = xEventGroupGetBits(network_event_group);
       } else {
-        ESP_LOGE(TAGW, "Lost connection to the network, %x", network_event_bits);
-        esp_wifi_connect();
+        //ESP_LOGE(TAGW, "Lost connection to the network, %x", network_event_bits);
         network_event_bits = xEventGroupGetBits(network_event_group);
       }
       vTaskDelay(sleep_time_ms / portTICK_PERIOD_MS);
