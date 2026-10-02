@@ -9,9 +9,16 @@ dependencies:
     source:
       type: idf
     version: 6.1.0
+  pedrominatel/tmc2208:
+    dependencies: []
+    source:
+      path: managed_components/pedrominatel__tmc2208
+      type: local
+    version: 0.1.0
 direct_dependencies:
 - espressif/coap
 - idf
-manifest_hash: d4fae7686f6db258d6a8e4f330ff80e8c11129f18a697694b27643175926d539
+- pedrominatel/tmc2208
+manifest_hash: 79db1fd7139a5ab6e04a4090754fccefce81572e5dbebb5190d77482f85105d4
 target: esp32c5
 version: 3.0.0

@@ -4099,6 +4099,26 @@ CONFIG_COAP_INTERNAL_MEM_ALLOC=y
 # end of CoAP Configuration
 
 #
+# Stepper Motor Driver TMC2208
+#
+
+#
+# GPIO Configuration
+#
+# default:
+CONFIG_MOTOR_STEP_IO=5
+# default:
+CONFIG_MOTOR_DIR_IO=4
+# default:
+CONFIG_MOTOR_EN_IO=10
+# default:
+CONFIG_MOTOR_MS1_IO=6
+# default:
+CONFIG_MOTOR_MS2_IO=7
+# end of GPIO Configuration
+# end of Stepper Motor Driver TMC2208
+
+#
 # WiFi STA Configuration
 #
 CONFIG_WIFI_STA_CONNECT=y
