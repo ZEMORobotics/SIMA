@@ -123,8 +123,9 @@ static void on_wifi_event(void *arg,
       xEventGroupClearBits(s_wifi_event_group, WIFI_STA_CONNECTED_BIT);
 #if CONFIG_WIFI_STA_AUTO_RECONNECT
       ESP_LOGI(TAG, "Attempting to reconnect...");
-      //wifi_sta_reconnect();
       esp_wifi_connect();
+      // Number of connection retries is not limited, due to the WiFi active time being
+      // limited only to the match duration which is 100 seconds.
 #endif
 
       break;
@@ -475,6 +476,15 @@ esp_err_t wifi_sta_init(EventGroupHandle_t event_group)
 
   return ESP_OK;
 }
+
+/* Following function basically tears down whole WiFi driver and builds it up again 
+   when trying to reconnect. For our use it is not optimal, and it's better to stick
+   to the documentation proposed manner of handling disconnection event by basic call
+   of esp_wifi_connect() API function. This suits our needs better, as the station(SIMA)
+   is going to connect only to one access point, so there is no need for unregistration of
+   all event handlers(even if there are multiple possible access points with same the SSID).
+
+*/
 
 // Stop WiFi
 esp_err_t wifi_sta_stop(void)

@@ -529,9 +529,7 @@ void app_main(void)
         ESP_LOGE(TAGW, "Failed to obtain IP address");
     }
 
-    //xTaskCreate(coap_example_client, "coap", 8 * 1024, NULL, 5, NULL);
-
-    int8_t test_reconnect = 80;
+    xTaskCreate(coap_example_client, "coap", 8 * 1024, NULL, 5, NULL);
 
     while (1)
     {
@@ -543,31 +541,6 @@ void app_main(void)
         network_event_bits = xEventGroupGetBits(network_event_group);
       }
       vTaskDelay(sleep_time_ms / portTICK_PERIOD_MS);
-
-      /*
-      --test_reconnect;
-      if (test_reconnect == 40) {
-        wifi_sta_stop();
-        network_event_bits = xEventGroupGetBits(network_event_group);
-      }
-      
-      if (test_reconnect <= 0) {
-        wifi_sta_init(NULL);
-        network_event_bits = xEventGroupWaitBits(network_event_group,
-                                             WIFI_STA_CONNECTED_BIT,
-                                             pdFALSE,
-                                             pdTRUE,
-                                             pdMS_TO_TICKS(connection_timeout_ms));
-        ESP_LOGI(TAGW, "Waiting for IP address...");
-        network_event_bits = xEventGroupWaitBits(network_event_group,
-                                             WIFI_STA_IPV4_OBTAINED_BIT |
-                                                WIFI_STA_IPV6_OBTAINED_BIT,
-                                             pdFALSE,
-                                             pdFALSE,
-                                             pdMS_TO_TICKS(connection_timeout_ms));
-
-        test_reconnect = 80;
-      }*/
     }
     
 }
