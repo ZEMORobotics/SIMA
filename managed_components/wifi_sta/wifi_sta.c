@@ -6,6 +6,8 @@
 
 #include "wifi_sta.h"
 
+#define MAX_RECONNECT_TIMEOUT 10000
+
 // Tag for debug messages
 static const char *TAG = "wifi_sta";
 
@@ -13,6 +15,7 @@ static const char *TAG = "wifi_sta";
 static esp_netif_t *s_wifi_netif = NULL;
 static EventGroupHandle_t s_wifi_event_group = NULL;
 static wifi_netif_driver_t s_wifi_driver = NULL;
+static uint32_t reconnect_timeout = 1000; 
 
 /**********************************************************************  
  * Private function prototypes
@@ -72,6 +75,8 @@ static void on_wifi_event(void *arg,
         return;
       }
 
+      reconnect_timeout = 1000;
+
       // Print AP information
       wifi_event_sta_connected_t *event_sta_connected =
         (wifi_event_sta_connected_t *) event_data;
@@ -122,10 +127,14 @@ static void on_wifi_event(void *arg,
       }
       xEventGroupClearBits(s_wifi_event_group, WIFI_STA_CONNECTED_BIT);
 #if CONFIG_WIFI_STA_AUTO_RECONNECT
-      ESP_LOGI(TAG, "Attempting to reconnect...");
+      vTaskDelay(pdMS_TO_TICKS(reconnect_timeout));
+      reconnect_timeout *= 1.5;
+      if (reconnect_timeout >= MAX_RECONNECT_TIMEOUT) {
+        ESP_LOGE(TAG, "Not able to reconnect, destroy driver");
+        wifi_sta_stop();
+      }
+      ESP_LOGI(TAG, "Attempting to reconnect..., timeout: %d", reconnect_timeout);
       esp_wifi_connect();
-      // Number of connection retries is not limited, due to the WiFi active time being
-      // limited only to the match duration which is 100 seconds.
 #endif
 
       break;
