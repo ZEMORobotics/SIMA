@@ -18,7 +18,7 @@ menu "WiFi STA Configuration"
         select LWIP_IPV4
         help
           Use only IPv4 for the WiFi connection.
-      config WIFI_STA_CONNECT_IP6
+      config WIFI_STA_CONNECT_IPV6
         bool "IPv6"
         select LWIP_IPV6
         help

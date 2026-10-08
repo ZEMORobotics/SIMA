@@ -412,7 +412,7 @@ static void coap_example_client(void *p)
 
     while (1) {
         request = coap_new_pdu(coap_is_mcast(&dst_addr) ? COAP_MESSAGE_NON : COAP_MESSAGE_CON,
-                               COAP_REQUEST_CODE_GET, session);
+                               COAP_REQUEST_CODE_POST, session);
         if (!request) {
             ESP_LOGE(TAG, "coap_new_pdu() failed");
             goto clean_up;
@@ -421,6 +421,15 @@ static void coap_example_client(void *p)
         coap_session_new_token(session, &tokenlength, token);
         coap_add_token(request, tokenlength, token);
 
+        u_char buf[4];
+            coap_insert_optlist(&optlist,
+                                coap_new_optlist(COAP_OPTION_CONTENT_FORMAT,
+                                                 coap_encode_var_safe (buf, sizeof (buf),
+                                                 COAP_MEDIATYPE_APPLICATION_JSON),
+                                                 buf));
+
+        const char *data = "Hello World";
+        coap_add_data_large_request(session, request, sizeof("Hello World"), (const uint8_t *)data, NULL, NULL);                                         
         /*
          * To make this a POST, you will need to do the following
          * Change COAP_REQUEST_CODE_GET to COAP_REQUEST_CODE_POST for coap_new_pdu()
