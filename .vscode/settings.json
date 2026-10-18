@@ -24,7 +24,7 @@
   "clangd.arguments": [
     "--background-index",
     "--query-driver=**",
-    "--compile-commands-dir=/home/andjelko/Documents/test/build"
+    "--compile-commands-dir=/home/andjelko/Documents/Robotika/ZEMO_SIMA/SIMA/build"
   ],
   "idf.openOcdConfigs": [
     "board/esp32c5-builtin.cfg"
