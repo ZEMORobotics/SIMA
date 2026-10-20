@@ -2,7 +2,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "tmc2208.h"
-#include "path_finding.h"
+#include "map.h"
+#include "path_finder.h"
 
 void app_main(void)
 {

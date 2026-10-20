@@ -10,14 +10,10 @@
                             node_xy[0] = (node_number % ROW_SIZE); \
                             node_xy[1] = (node_number / ROW_SIZE); \
                             } while (0);
-#define UPDATE_F_VALUE(node, new_f_value) node = new_f_value
 
 typedef uint8_t FValue;
-enum MoveCosts {STRAIGHT = 1, DIAGONAL = 2};
+typedef enum TableElements {FREE, CASTLE, STABLE, QUARRY, MOAT, ROBOT} TableElements;
 
-void set_init_node(uint16_t x, uint16_t y);
-void set_end_node(uint16_t x, uint16_t y);
-uint8_t heuristic(uint16_t node_number);
-uint8_t calculate_f_value(uint16_t node_number);
-uint8_t get_f_value(uint16_t node_number);
+extern volatile TableElements *const pmap;
+
 void map_init(void);
