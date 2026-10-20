@@ -25,7 +25,7 @@ typedef struct Node
   int16_t num;
   uint8_t h_cost;
   uint8_t g_cost;
-  uint8_t f_cost;
+  uint16_t f_cost;
 } Node;
 
 

@@ -22,7 +22,7 @@ void enqueue(PriorityQueue *pq, Node const *n) {
   }
   
   pq->items[pq->size++] = *n;
-  pq->items = (Node *) realloc(pq->items, sizeof(pq->size + 1));
+  pq->items = (Node *) realloc(pq->items, (pq->size + 1) * sizeof(Node));
   heapify_up(pq, pq->size - 1);
 }
 
@@ -53,6 +53,7 @@ Node dequeue(PriorityQueue *pq) {
 
   Node item = pq->items[0];
   pq->items[0] = pq->items[--pq->size + 1];
+  pq->items = (Node *) realloc(pq->items, (pq->size + 1) * sizeof(Node));
   heapify_down(pq, 0);
   return item;
 }

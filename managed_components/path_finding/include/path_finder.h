@@ -12,4 +12,4 @@ uint8_t heuristic(uint16_t node_number);
 uint8_t calculate_g_value(uint16_t node_number, uint16_t prev_number);
 // uint8_t calculate_f_value(uint8_t g_value, uint8_t h_value);
 
-uint8_t get_f_value(uint16_t node_number);
+uint16_t get_f_value(uint16_t node_number);

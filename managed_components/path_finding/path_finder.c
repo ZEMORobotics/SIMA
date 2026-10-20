@@ -1,5 +1,6 @@
 #include "map.h"
 #include "path_finder.h"
+#include "prio_queue.h"
 
 #define MIN(a, b) ((a < b) ? a : b)
 
@@ -51,8 +52,8 @@ uint16_t *get_neighbors(uint16_t node_number) {
 }
 
 int8_t is_obstacle(uint16_t node_number) {
-  if (pmap[node_number].element == QUARRY || pmap[node_number].element == CASTLE ||
-      pmap[node_number].element == ROBOT)
+  if (pmap[node_number].element == (TableElements) QUARRY || pmap[node_number].element == (TableElements) CASTLE ||
+      pmap[node_number].element == (TableElements) ROBOT)
     return -1;
   else
     return 0;
@@ -84,6 +85,6 @@ uint8_t calculate_g_value(uint16_t node_number, uint16_t prev_number) {
     return pmap[prev_number].g_cost + D;
 }
 
-uint8_t get_f_value(uint16_t node_number) {
+uint16_t get_f_value(uint16_t node_number) {
   return pmap[node_number].element;
 }
