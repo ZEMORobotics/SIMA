@@ -12,5 +12,6 @@ uint8_t heuristic(uint16_t node_number);
 uint8_t calculate_g_value(uint16_t node_number, uint16_t prev_number);
 void revert_state(void);
 uint8_t path_find(void);
+int16_t *reconstruct_path(int16_t *len);
 
 uint16_t get_f_value(uint16_t node_number);

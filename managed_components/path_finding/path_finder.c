@@ -101,8 +101,14 @@ uint8_t calculate_g_value(uint16_t node_number, uint16_t prev_number) {
 }
 
 void revert_state(void) {
-  for (uint16_t i = MAX_SIZE; i > 0; --i)
-    pmap[i - 1].state = NONE;
+  for (int16_t i = MAP_SIZE - 1; i >= 0; --i) {
+    pmap[i].state = NONE;
+    pmap[i].prev = NAB;
+    pmap[i].num = i;
+    pmap[i].f_cost = NCB;
+    pmap[i].h_cost = NCB;
+    pmap[i].g_cost = NCB;
+  }
 }
 
 uint8_t path_find(void)
@@ -113,6 +119,7 @@ uint8_t path_find(void)
   uint16_t *neighbors;
   int8_t nb_size;
 
+  //map_init();
   revert_state();
 
   pq_init(&open);
@@ -121,15 +128,19 @@ uint8_t path_find(void)
   if (closed == NULL)
     ESP_LOGE(TAG_PF, "path_find: allocation fail");
   
-  enqueue(&open, &init_node);
+  if (is_obstacle(init_node.num))
+    return 0;
+
+
   init_node.state = OPEN;
+  enqueue(&open, &init_node);
 
   while (!empty(&open)) {
     
     Node current = dequeue(&open);
     pmap[current.num].state = CLOSED;
 
-    ESP_LOGI(TAG_PF, "Node num check 0: %d", current.num);
+    //ESP_LOGI(TAG_PF, "Node num check 0: %d", current.num);
     
     closed[cl_size++] = current.num;
     closed = (uint16_t *) realloc(closed, (cl_size + 1) * sizeof(uint16_t));
@@ -146,7 +157,7 @@ uint8_t path_find(void)
 
       break;
     }
-
+  
     neighbors = get_neighbors(current.num, &nb_size);
 
     //ESP_LOGI(TAG_PF, "Node num check 2: %d ", current.num);
@@ -159,7 +170,7 @@ uint8_t path_find(void)
       }
     
       uint16_t cost = calculate_g_value(neighbors[nb_size], current.num);
-
+    
       if (cost < pmap[neighbors[nb_size]].g_cost || pmap[neighbors[nb_size]].state != OPEN) {
         pmap[neighbors[nb_size]].g_cost = cost;
         pmap[neighbors[nb_size]].f_cost = cost + heuristic(neighbors[nb_size]);
@@ -178,9 +189,34 @@ uint8_t path_find(void)
   closed = NULL;
   
   if (pmap[end_node.num].prev != NAB) 
-    return 1;
+    return pmap[end_node.num].prev;
   else
     return 0;
+
+}
+
+int16_t *reconstruct_path(int16_t *len) {
+  int16_t *path, temp = 0, k = 0;
+
+  path = (int16_t *) malloc(sizeof(int16_t));
+  if (path == NULL) {
+    ESP_LOGE(TAG_PF, "reconstruct_path: allocation fail");
+    return NULL;
+  }
+
+  path[k++] = end_node.num;
+  temp = pmap[end_node.num].prev;
+  while (temp != init_node.num) {
+    path = (int16_t *) realloc(path, (k + 1) * sizeof(int16_t));
+    path[k++] = temp;
+    temp = pmap[temp].prev;
+  }
+  path = (int16_t *) realloc(path, (k + 1) * sizeof(int16_t));
+  path[k++] = temp;
+
+  *len = k;
+
+  return path;
 
 }
 
