@@ -19,4 +19,6 @@ void enqueue(PriorityQueue *pq, Node const *n);
 void heapify_down(PriorityQueue *pq, uint16_t index);
 Node dequeue(PriorityQueue *pq);
 Node peek(PriorityQueue *pq);
+uint8_t empty(PriorityQueue *pq);
+void delete(PriorityQueue *pq);
 

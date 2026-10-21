@@ -16,11 +16,11 @@
 
 typedef uint8_t FValue;
 typedef enum TableElements {FREE, CASTLE, STABLE, QUARRY, MOAT, ROBOT} TableElements;
-typedef enum State {OPEN, CLOSED} State;
+typedef enum State {OPEN, CLOSED, NONE} State;
 typedef struct Node
 {
-  TableElements element;
-  State state;
+  uint8_t element;
+  uint8_t state;
   int16_t prev;
   int16_t num;
   uint8_t h_cost;

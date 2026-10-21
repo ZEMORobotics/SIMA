@@ -8,7 +8,7 @@
 void app_main(void)
 {
     set_init_node(39, 59);
-    set_end_node(0, 0);
+    set_end_node(12, 34);
     map_init();
 
     for (int16_t i = MAP_SIZE - 1; i >= 0; --i) {
@@ -17,10 +17,27 @@ void app_main(void)
             printf("\n");
     }
 
+    if (path_find()) {
+        printf("Found something for now.\n");
+    } else {
+        printf("Too long.\n");
+    }
+
+    uint8_t flag = 1;
     while (1)
     {
-        printf("Calculated heuristic\n");
         vTaskDelay(10000 / portTICK_PERIOD_MS);
+        if (flag) {
+            flag = 0;
+            set_init_node(15, 24);
+            set_end_node(12, 34);
+            if (path_find()) {
+                printf("Found something for now.\n");
+            } else {
+                printf("Too long.\n");
+            }
+        }
+        printf("Test\n");
     }
     
 }

@@ -8,10 +8,12 @@ void map_init(void) {
 
   for (int16_t i = MAP_SIZE - 1; i >= 0; --i) {
     map[i].element = FREE;
-    map[i].state = OPEN;
+    map[i].state = NONE;
     map[i].prev = NAB;
+    map[i].num = i;
     map[i].f_cost = NCB;
     map[i].h_cost = NCB;
+    map[i].g_cost = NCB;
   }
 
   // Right side quarries
