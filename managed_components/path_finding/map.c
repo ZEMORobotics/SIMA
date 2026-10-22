@@ -13,7 +13,6 @@ void map_init(void) {
     map[i].prev = NAB;
     map[i].num = i;
     map[i].f_cost = NCB;
-    map[i].h_cost = NCB;
     map[i].g_cost = NCB;
   }
 
@@ -120,7 +119,7 @@ void map_init(void) {
 
 }
 
-uint16_t get_element(uint16_t node_number) {
+uint8_t get_element(uint16_t node_number) {
   return map[node_number].element;
 }
 

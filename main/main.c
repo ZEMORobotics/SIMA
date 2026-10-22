@@ -9,8 +9,8 @@
 
 void app_main(void)
 {
-    set_end_node(12, 34);
-    set_init_node(15, 24);
+    set_end_num(12, 34);
+    set_init_num(15, 24);
     map_init();
 
     print_path(NULL, 0);
@@ -24,7 +24,7 @@ void app_main(void)
         r = rand() % NUMBER_OF_ROWS;
         c = rand() % ROW_SIZE;
         vTaskDelay(250 / portTICK_PERIOD_MS);
-        set_init_node(c, r);
+        set_init_num(c, r);
         if (path_find())
         {
             printf("Found something for now. Start node %d, end node %d\n", XY_TO_NODE(c, r), XY_TO_NODE(12, 34));
@@ -32,9 +32,9 @@ void app_main(void)
             path = reconstruct_path(&len);
             if (path != NULL)
             {
-                print_path(path, &len);
-                //for (--len; len >= 0; --len)
-                    //printf("%d\n", path[len]);
+                //print_path(path, &len);
+                for (--len; len >= 0; --len)
+                    printf("%d\n", path[len]);
 
                 free(path);
             }

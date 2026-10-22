@@ -1,3 +1,6 @@
+#ifndef MAP_H
+#define MAP_H
+
 #include <stdlib.h>
 
 #define MAP_SIZE 2400
@@ -23,7 +26,6 @@ typedef struct Node
   uint8_t state;
   int16_t prev;
   int16_t num;
-  uint16_t h_cost;
   uint16_t g_cost;
   uint16_t f_cost;
 } Node;
@@ -32,5 +34,7 @@ typedef struct Node
 extern volatile Node *const pmap;
 
 void map_init(void);
-uint16_t get_element(uint16_t node_number);
+uint8_t get_element(uint16_t node_number);
 void print_path(int16_t *path, int16_t *len);
+
+#endif // MAP_H

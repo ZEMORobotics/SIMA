@@ -1,3 +1,6 @@
+#ifndef PRIO_QUEUE_H
+#define PRIO_QUEUE_H
+
 #include <stdlib.h>
 #include "map.h"
 
@@ -21,4 +24,6 @@ Node dequeue(PriorityQueue *pq);
 Node peek(PriorityQueue *pq);
 uint8_t empty(PriorityQueue *pq);
 void delete(PriorityQueue *pq);
+
+#endif // PRIO_QUEUEU_H
 
