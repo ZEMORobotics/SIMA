@@ -1,9 +1,12 @@
 #include "map.h"
+#include <stdio.h>
 #include "path_finder.h"
 #include "prio_queue.h"
 #include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
-#define MIN(a, b) ((a < b) ? a : b)
+//#define MIN(a, b) ((a < b) ? a : b)
 
 #define TAG_PF "path_find"
 
@@ -87,12 +90,12 @@ uint8_t heuristic(uint16_t node_number) {
   return D * (dx + dy) + (D2 - 2 * D) * MIN(dx, dy);
 }
 
-uint8_t calculate_g_value(uint16_t node_number, uint16_t prev_number) {
+uint16_t calculate_g_value(uint16_t node_number, uint16_t prev_number) {
   uint8_t node_row = node_number / ROW_SIZE;
   uint8_t node_col = node_number % ROW_SIZE;
-  uint8_t prev_row = node_number / ROW_SIZE;
-  uint8_t prev_col = node_number % ROW_SIZE;
-  uint8_t dx = node_col - prev_col, dy = node_row - prev_row;
+  uint8_t prev_row = prev_number / ROW_SIZE;
+  uint8_t prev_col = prev_number % ROW_SIZE;
+  int8_t dx = node_col - prev_col, dy = node_row - prev_row;
 
   if (abs(dx + dy) == 0 || abs(dx + dy) == 2)
     return pmap[prev_number].g_cost + D2;
@@ -111,7 +114,7 @@ void revert_state(void) {
   }
 }
 
-uint8_t path_find(void)
+uint16_t path_find(void)
 {
   PriorityQueue open;
   uint16_t *closed;
@@ -119,7 +122,6 @@ uint8_t path_find(void)
   uint16_t *neighbors;
   int8_t nb_size;
 
-  //map_init();
   revert_state();
 
   pq_init(&open);
@@ -139,6 +141,8 @@ uint8_t path_find(void)
     
     Node current = dequeue(&open);
     pmap[current.num].state = CLOSED;
+    if (current.num == init_node.num)
+      pmap[current.num].g_cost = 0;
 
     //ESP_LOGI(TAG_PF, "Node num check 0: %d", current.num);
     
@@ -152,9 +156,7 @@ uint8_t path_find(void)
     if (current.num == end_node.num) {
       if (current.num == init_node.num)
         pmap[current.num].prev = current.num;
-      else
-        pmap[current.num].prev = closed[cl_size - 2];
-
+      ESP_LOGI(TAG_PF, "Left loop found");
       break;
     }
   
@@ -162,6 +164,7 @@ uint8_t path_find(void)
 
     //ESP_LOGI(TAG_PF, "Node num check 2: %d ", current.num);
 
+    //printf("Enqueued: \n");
     for (--nb_size; nb_size >= 0; --nb_size) {
 
       if (pmap[neighbors[nb_size]].state == CLOSED || is_obstacle(neighbors[nb_size])) {
@@ -169,6 +172,7 @@ uint8_t path_find(void)
         continue;
       }
     
+      //printf("%d ", neighbors[nb_size]);
       uint16_t cost = calculate_g_value(neighbors[nb_size], current.num);
     
       if (cost < pmap[neighbors[nb_size]].g_cost || pmap[neighbors[nb_size]].state != OPEN) {
@@ -177,6 +181,10 @@ uint8_t path_find(void)
         pmap[neighbors[nb_size]].state = OPEN;
         enqueue(&open, (Node const *) &pmap[neighbors[nb_size]]);
         pmap[neighbors[nb_size]].prev = current.num;
+        //printf("%d %d %d %d\n", pmap[neighbors[nb_size]].num,
+                              //pmap[neighbors[nb_size]].f_cost,
+                              //pmap[neighbors[nb_size]].g_cost,
+                              //pmap[neighbors[nb_size]].prev);
       }
     }
 
@@ -218,8 +226,4 @@ int16_t *reconstruct_path(int16_t *len) {
 
   return path;
 
-}
-
-uint16_t get_f_value(uint16_t node_number) {
-  return pmap[node_number].element;
 }

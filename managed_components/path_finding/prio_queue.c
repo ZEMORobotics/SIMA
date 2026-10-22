@@ -11,7 +11,8 @@ void pq_init(PriorityQueue *pq) {
 }
 
 void heapify_up(PriorityQueue *pq, uint16_t index) {
-  if (index && pq->items[(index - 1) / 2].f_cost > pq->items[index].f_cost) {
+  if (index && ((pq->items[(index - 1) / 2].f_cost > pq->items[index].f_cost)
+                || (pq->items[(index - 1) / 2].h_cost > pq->items[index].h_cost))) {
     SWAP(&pq->items[(index - 1) / 2], &pq->items[index])
     heapify_up(pq, (index - 1) / 2);
   }

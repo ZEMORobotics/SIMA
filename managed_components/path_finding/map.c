@@ -1,4 +1,5 @@
 #include "map.h"
+#include <stdio.h>
 
 Node map[MAP_SIZE];
 volatile Node *const pmap = map;
@@ -117,4 +118,36 @@ void map_init(void) {
     }
   }
 
+}
+
+uint16_t get_element(uint16_t node_number) {
+  return map[node_number].element;
+}
+
+void print_path(int16_t *path, int16_t *len) {
+  register uint8_t print_f = 0, no_path_f = 0;
+
+  if (path == NULL || *len == 0)
+    no_path_f = 1;
+
+  for (int16_t i = MAP_SIZE - 1; i >= 0; --i)
+    {
+        if (!no_path_f) {
+          for (int16_t j = *len - 1; j >= 0; --j) {
+            if (path[j] == i) {
+              print_f = 1;
+              break;
+            }
+          }
+        }
+        if (print_f) {
+          print_f = 0;
+          printf("8 ");
+        } else {
+          printf("%d ", map[i].element);
+        }
+        
+        if (!(i % ROW_SIZE))
+            printf("\n");
+    }
 }

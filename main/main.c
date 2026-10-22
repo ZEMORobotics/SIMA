@@ -13,12 +13,7 @@ void app_main(void)
     set_init_node(15, 24);
     map_init();
 
-    for (int16_t i = MAP_SIZE - 1; i >= 0; --i)
-    {
-        printf("%d ", get_f_value(i));
-        if (!(i % ROW_SIZE))
-            printf("\n");
-    }
+    print_path(NULL, 0);
 
     uint8_t r, c;
     int16_t *path = NULL, len = 0;
@@ -37,9 +32,9 @@ void app_main(void)
             path = reconstruct_path(&len);
             if (path != NULL)
             {
-                printf("Follow the path:\n");
-                for (--len; len >= 0; --len)
-                    printf("%d\n", path[len]);
+                print_path(path, &len);
+                //for (--len; len >= 0; --len)
+                    //printf("%d\n", path[len]);
 
                 free(path);
             }
