@@ -25,7 +25,7 @@ void app_main(void)
         c = rand() % ROW_SIZE;
         vTaskDelay(250 / portTICK_PERIOD_MS);
         set_init_num(c, r);
-        if (path_find())
+        if (path_find() >= 0)
         {
             printf("Found something for now. Start node %d, end node %d\n", XY_TO_NODE(c, r), XY_TO_NODE(12, 34));
             vTaskDelay(5000 / portTICK_PERIOD_MS);

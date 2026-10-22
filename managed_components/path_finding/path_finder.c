@@ -36,8 +36,8 @@ void set_end_node(void) {
 }
 
 // Obavezno free da se uradi nakon provere
-uint16_t *get_neighbors(uint16_t node_number, int8_t *len) {
-  uint16_t *neighbors = (uint16_t *) malloc(8 * sizeof(uint16_t));
+int16_t *get_neighbors(int16_t node_number, int8_t *len) {
+  int16_t *neighbors = (int16_t *) malloc(8 * sizeof(int16_t));
 
   if (neighbors == NULL)
     ESP_LOGE(TAG_PF, "get_neighbors: allocation fail");
@@ -62,7 +62,7 @@ uint16_t *get_neighbors(uint16_t node_number, int8_t *len) {
   }
 
   if (k < 8) {
-    neighbors = (uint16_t *) realloc(neighbors, (k + 1) * sizeof(uint16_t));
+    neighbors = (int16_t *) realloc(neighbors, (k + 1) * sizeof(int16_t));
 
     if (neighbors == NULL)
       ESP_LOGE(TAG_PF, "get_neighbors: reallocation fail");
@@ -73,7 +73,7 @@ uint16_t *get_neighbors(uint16_t node_number, int8_t *len) {
   return neighbors;
 }
 
-int8_t is_obstacle(uint16_t node_number) {
+int8_t is_obstacle(int16_t node_number) {
   if (pmap[node_number].element == QUARRY || pmap[node_number].element == CASTLE ||
       pmap[node_number].element == ROBOT)
     return 1;
@@ -81,7 +81,7 @@ int8_t is_obstacle(uint16_t node_number) {
     return 0;
 }
 
-uint16_t heuristic(uint16_t node_number) {
+uint16_t heuristic(int16_t node_number) {
   register uint16_t dx, dy;
   register uint16_t xy_node[2], xy_goal[2];
 
@@ -94,7 +94,7 @@ uint16_t heuristic(uint16_t node_number) {
   return D * (dx + dy) + (D2 - 2 * D) * MIN(dx, dy);
 }
 
-uint16_t calculate_g_value(uint16_t node_number, uint16_t prev_number) {
+uint16_t calculate_g_value(int16_t node_number, int16_t prev_number) {
   uint8_t node_row = node_number / ROW_SIZE;
   uint8_t node_col = node_number % ROW_SIZE;
   uint8_t prev_row = prev_number / ROW_SIZE;
@@ -117,12 +117,12 @@ void revert_state(void) {
   }
 }
 
-uint16_t path_find(void)
+int16_t path_find(void)
 {
   PriorityQueue open;
-  uint16_t *closed;
+  int16_t *closed;
   int16_t cl_size = 0;
-  uint16_t *neighbors;
+  int16_t *neighbors;
   int8_t nb_size = 0;
 
   revert_state();
@@ -131,13 +131,13 @@ uint16_t path_find(void)
   set_end_node();
 
   pq_init(&open);
-  closed = (uint16_t *) malloc(sizeof(uint16_t));
+  closed = (int16_t *) malloc(sizeof(int16_t));
 
   if (closed == NULL)
     ESP_LOGE(TAG_PF, "path_find: allocation fail");
   
-  if (is_obstacle(init_node))
-    return 0;
+  if (is_obstacle(init_node) || is_obstacle(end_node))
+    return INVALID_NODE;
 
 
   pmap[init_node].state = OPEN;  
@@ -153,7 +153,7 @@ uint16_t path_find(void)
     //ESP_LOGI(TAG_PF, "Node num check 0: %d", current.num);
     
     closed[cl_size++] = current.num;
-    closed = (uint16_t *) realloc(closed, (cl_size + 1) * sizeof(uint16_t));
+    closed = (int16_t *) realloc(closed, (cl_size + 1) * sizeof(int16_t));
     if (closed == NULL)
       ESP_LOGE(TAG_PF, "path_find: reallocation fail");
     
@@ -203,7 +203,7 @@ uint16_t path_find(void)
   if (pmap[end_node].prev != NAB) 
     return pmap[end_node].prev;
   else
-    return 0;
+    return PATH_NOT_FOUND;
 
 }
 

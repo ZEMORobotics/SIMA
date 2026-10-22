@@ -119,7 +119,7 @@ void map_init(void) {
 
 }
 
-uint8_t get_element(uint16_t node_number) {
+uint8_t get_element(int16_t node_number) {
   return map[node_number].element;
 }
 

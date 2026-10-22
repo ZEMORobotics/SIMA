@@ -9,7 +9,7 @@
 #define RESOLUTION 50
 
 #define NAB -1 // Not accessed before
-#define NCB -2 // Not calculated before
+#define NCB 16383 // Not calculated before
 
 #define XY_TO_NODE(x, y) ((y * ROW_SIZE) + x)
 #define NODE_TO_XY(node_number, node_xy) do { \
@@ -17,7 +17,6 @@
                             node_xy[1] = (node_number / ROW_SIZE); \
                             } while (0);
 
-typedef uint8_t FValue;
 typedef enum TableElements {FREE, CASTLE, STABLE, QUARRY, MOAT, ROBOT} TableElements;
 typedef enum State {OPEN, CLOSED, NONE} State;
 typedef struct Node
@@ -34,7 +33,7 @@ typedef struct Node
 extern volatile Node *const pmap;
 
 void map_init(void);
-uint8_t get_element(uint16_t node_number);
+uint8_t get_element(int16_t node_number);
 void print_path(int16_t *path, int16_t *len);
 
 #endif // MAP_H
