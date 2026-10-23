@@ -9,7 +9,7 @@
 #define RESOLUTION 50
 
 #define NAB -1 // Not accessed before
-#define NCB 16383 // Not calculated before
+#define NCB 65535 // Not calculated before
 
 #define XY_TO_NODE(x, y) ((y * ROW_SIZE) + x)
 #define NODE_TO_XY(node_number, node_xy) do { \
@@ -24,11 +24,9 @@ typedef struct Node
   uint8_t element;
   uint8_t state;
   int16_t prev;
-  int16_t num;
   uint16_t g_cost;
   uint16_t f_cost;
 } Node;
-
 
 extern volatile Node *const pmap;
 

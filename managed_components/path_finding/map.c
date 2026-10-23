@@ -11,7 +11,6 @@ void map_init(void) {
     map[i].element = FREE;
     map[i].state = NONE;
     map[i].prev = NAB;
-    map[i].num = i;
     map[i].f_cost = NCB;
     map[i].g_cost = NCB;
   }

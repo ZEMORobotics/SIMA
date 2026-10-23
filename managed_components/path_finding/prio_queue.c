@@ -1,30 +1,31 @@
 #include "prio_queue.h"
 #include "esp_log.h"
+#include "map.h"
 
 #define TAG "prio_queue"
 
 void pq_init(PriorityQueue *pq) {
-  pq->items = (Node *) malloc(sizeof(Node));
+  pq->items = (int16_t *) malloc(sizeof(int16_t));
   if (pq->items == NULL)
     ESP_LOGE(TAG, "pq_init: allocation fail");
   pq->size = 0;
 }
 
 void heapify_up(PriorityQueue *pq, uint16_t index) {
-  if (index && ((pq->items[(index - 1) / 2].f_cost > pq->items[index].f_cost))) { 
+  if (index && ((pmap[pq->items[(index - 1) / 2]].f_cost > pmap[pq->items[index]].f_cost))) { 
     SWAP(&pq->items[(index - 1) / 2], &pq->items[index])
     heapify_up(pq, (index - 1) / 2);
   }
 }
 
-void enqueue(PriorityQueue *pq, Node const *n) {
+void enqueue(PriorityQueue *pq, int16_t n) {
   if (pq->size == MAX_SIZE) {
     ESP_LOGE(TAG, "enqueue: Queue full");
     return;
   }
   
-  pq->items[pq->size++] = *n;
-  pq->items = (Node *) realloc(pq->items, (pq->size + 1) * sizeof(Node));
+  pq->items[pq->size++] = n;
+  pq->items = (int16_t *) realloc(pq->items, (pq->size + 1) * sizeof(int16_t));
   if (pq->items == NULL)
     ESP_LOGE(TAG, "enqueue: reallocation fail");
   heapify_up(pq, pq->size - 1);
@@ -36,11 +37,11 @@ void heapify_down(PriorityQueue *pq, uint16_t index) {
   uint16_t right = 2 * index + 2;
 
   if (left < pq->size
-      && pq->items[left].f_cost < pq->items[smallest].f_cost)
+      && pmap[pq->items[left]].f_cost < pmap[pq->items[smallest]].f_cost)
     smallest = left;
   
   if (right < pq->size
-      && pq->items[right].f_cost < pq->items[smallest].f_cost)
+      && pmap[pq->items[right]].f_cost < pmap[pq->items[smallest]].f_cost)
     smallest = right;
 
   if (smallest != index) {
@@ -49,22 +50,22 @@ void heapify_down(PriorityQueue *pq, uint16_t index) {
   }
 }
 
-Node dequeue(PriorityQueue *pq) {
+int16_t dequeue(PriorityQueue *pq) {
   if (!pq->size) {
     ESP_LOGE(TAG, "dequeue: Queue empty");
     abort();
   }
 
-  Node item = pq->items[0];
-  pq->items[0] = pq->items[--pq->size + 1];
-  pq->items = (Node *) realloc(pq->items, (pq->size + 1) * sizeof(Node));
+  int16_t item = pq->items[0];
+  pq->items[0] = pq->items[--pq->size];
+  pq->items = (int16_t *) realloc(pq->items, (pq->size + 1) * sizeof(int16_t));
   if (pq->items == NULL)
     ESP_LOGE(TAG, "enqueue: reallocation fail");
   heapify_down(pq, 0);
   return item;
 }
 
-Node peek(PriorityQueue *pq) {
+int16_t peek(PriorityQueue *pq) {
   if (!pq->size) {
     ESP_LOGE(TAG, "Queue empty");
     abort();

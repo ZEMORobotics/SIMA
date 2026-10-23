@@ -21,7 +21,6 @@ void set_end_num(uint16_t x, uint16_t y) {
 
 void set_init_node(void) {
   pmap[init_node].prev = NAB;
-  pmap[init_node].num = init_node;
   pmap[init_node].g_cost = 0;
   pmap[init_node].f_cost = heuristic(init_node);
   pmap[init_node].state = NONE;
@@ -29,7 +28,6 @@ void set_init_node(void) {
 
 void set_end_node(void) { 
   pmap[end_node].prev = NAB;
-  pmap[end_node].num = end_node;
   pmap[end_node].g_cost = NCB;
   pmap[end_node].f_cost = NCB;
   pmap[end_node].state = NONE;
@@ -56,7 +54,7 @@ int16_t *get_neighbors(int16_t node_number, int8_t *len) {
             (node_col + dx[i] < 0) || (node_col + dx[i] >= ROW_SIZE))
             continue;
 
-        neighbors[k++] = pmap[(node_row + dy[j]) * ROW_SIZE + (node_col + dx[i])].num;
+        neighbors[k++] = (node_row + dy[j]) * ROW_SIZE + (node_col + dx[i]);
       }
     }
   }
@@ -111,7 +109,6 @@ void revert_state(void) {
   for (int16_t i = MAP_SIZE - 1; i >= 0; --i) {
     pmap[i].state = NONE;
     pmap[i].prev = NAB;
-    pmap[i].num = i;
     pmap[i].f_cost = NCB;
     pmap[i].g_cost = NCB;
   }
@@ -120,9 +117,9 @@ void revert_state(void) {
 int16_t path_find(void)
 {
   PriorityQueue open;
-  int16_t *closed;
+  int16_t *closed = NULL;
   int16_t cl_size = 0;
-  int16_t *neighbors;
+  int16_t *neighbors = NULL;
   int8_t nb_size = 0;
 
   revert_state();
@@ -141,32 +138,31 @@ int16_t path_find(void)
 
 
   pmap[init_node].state = OPEN;  
-  enqueue(&open, (Node const *) &pmap[init_node]);
+  enqueue(&open, init_node);
 
   while (!empty(&open)) {
     
-    Node current = dequeue(&open);
-    pmap[current.num].state = CLOSED;
-    if (current.num == init_node)
-      pmap[current.num].g_cost = 0;
+    int16_t current = dequeue(&open);
+    pmap[current].state = CLOSED;
+    if (current == init_node)
+      pmap[current].g_cost = 0;
 
-    //ESP_LOGI(TAG_PF, "Node num check 0: %d", current.num);
+    //ESP_LOGI(TAG_PF, "Node num check 0: %d", current);
     
-    closed[cl_size++] = current.num;
+    closed[cl_size++] = current;
     closed = (int16_t *) realloc(closed, (cl_size + 1) * sizeof(int16_t));
     if (closed == NULL)
       ESP_LOGE(TAG_PF, "path_find: reallocation fail");
     
     //ESP_LOGI(TAG_PF, "Node num check 1: %d ", current.num);
 
-    if (current.num == end_node) {
-      if (current.num == init_node)
-        pmap[current.num].prev = current.num;
-      //ESP_LOGI(TAG_PF, "Left loop found");
+    if (current == end_node) {
+      if (current == init_node)
+        pmap[current].prev = current;
       break;
     }
   
-    neighbors = get_neighbors(current.num, &nb_size);
+    neighbors = get_neighbors(current, &nb_size);
 
     //ESP_LOGI(TAG_PF, "Node num check 2: %d ", current.num);
 
@@ -177,15 +173,15 @@ int16_t path_find(void)
         continue;
       }
     
-      uint16_t cost = calculate_g_value(neighbors[nb_size], current.num);
+      uint16_t cost = calculate_g_value(neighbors[nb_size], current);
     
       if (cost < pmap[neighbors[nb_size]].g_cost || pmap[neighbors[nb_size]].state != OPEN) {
         pmap[neighbors[nb_size]].g_cost = cost;
         pmap[neighbors[nb_size]].f_cost = cost + (int16_t) round(1.05 * heuristic(neighbors[nb_size]));
         pmap[neighbors[nb_size]].state = OPEN;
-        enqueue(&open, (Node const *) &pmap[neighbors[nb_size]]);
-        pmap[neighbors[nb_size]].prev = current.num;
-        //printf("%d %d %d %d\n", pmap[neighbors[nb_size]].num,
+        enqueue(&open, neighbors[nb_size]);
+        pmap[neighbors[nb_size]].prev = current;
+        //printf("%d %d %d %d\n", neighbors[nb_size],
                               //pmap[neighbors[nb_size]].f_cost,
                               //pmap[neighbors[nb_size]].g_cost,
                               //pmap[neighbors[nb_size]].prev);

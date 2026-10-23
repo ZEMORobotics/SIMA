@@ -9,34 +9,36 @@
 
 void app_main(void)
 {
-    set_end_num(12, 34);
-    set_init_num(15, 24);
     map_init();
 
     print_path(NULL, 0);
 
-    uint8_t r, c;
+    uint8_t ri, ci, re, ce;
     int16_t *path = NULL, len = 0;
 
     srand(time(0));
     while (1)
     {
-        r = rand() % NUMBER_OF_ROWS;
-        c = rand() % ROW_SIZE;
+        ri = rand() % NUMBER_OF_ROWS;
+        ci = rand() % ROW_SIZE;
+        re = rand() % NUMBER_OF_ROWS;
+        ce = rand() % ROW_SIZE;
         vTaskDelay(250 / portTICK_PERIOD_MS);
-        set_init_num(c, r);
+        set_init_num(ci, ri);
+        set_end_num(ce, re);
         if (path_find() >= 0)
         {
-            printf("Found something for now. Start node %d, end node %d\n", XY_TO_NODE(c, r), XY_TO_NODE(12, 34));
+            printf("Found something for now. Start node %d, end node %d\n", XY_TO_NODE(ci, ri), XY_TO_NODE(ce, re));
             vTaskDelay(5000 / portTICK_PERIOD_MS);
             path = reconstruct_path(&len);
             if (path != NULL)
             {
-                //print_path(path, &len);
+                print_path(path, &len);
                 for (--len; len >= 0; --len)
                     printf("%d\n", path[len]);
 
                 free(path);
+                path = NULL;
             }
         }
         else
