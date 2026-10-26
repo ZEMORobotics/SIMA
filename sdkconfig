@@ -4093,6 +4093,18 @@ CONFIG_COAP_INTERNAL_MEM_ALLOC=y
 # end of CoAP Configuration
 
 #
+# Path Finder Configuration
+#
+# default:
+CONFIG_START_NODE_NUMBER=0
+# default:
+CONFIG_END_NODE_NUMBER=0
+CONFIG_ADD_INFLATION=y
+CONFIG_INFLATION_DEPTH=3
+CONFIG_INFLATION_STEP=28
+# end of Path Finder Configuration
+
+#
 # Stepper Motor Driver TMC2208
 #
 

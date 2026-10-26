@@ -6,6 +6,7 @@
 #include "tmc2208.h"
 #include "map.h"
 #include "path_finder.h"
+#include "inflation_layer.h"
 
 void app_main(void)
 {
@@ -15,6 +16,17 @@ void app_main(void)
 
     uint8_t ri, ci, re, ce;
     int16_t *path = NULL, len = 0;
+
+    apply_inflation(CONFIG_INFLATION_DEPTH);
+
+    printf("\n\n\n");
+    for (int16_t i = MAP_SIZE - 1; i >= 0; --i)
+    {
+        printf("%d ", pinf[i]);   
+        if (!(i % ROW_SIZE))
+            printf("\n");
+    }
+    
 
     srand(time(0));
     while (1)

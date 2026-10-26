@@ -3,6 +3,7 @@
 #include "map.h"
 #include "path_finder.h"
 #include "prio_queue.h"
+#include "inflation_layer.h"
 #include "esp_log.h"
 
 #define MIN(a, b) ((a < b) ? a : b)
@@ -11,29 +12,47 @@
 
 static int16_t init_node = 0, end_node = 0;
 
+/********************************************************************************/
 void set_init_num(uint16_t x, uint16_t y) {
   init_node = XY_TO_NODE(x, y);
 }
+/********************************************************************************/
 
+/********************************************************************************/
 void set_end_num(uint16_t x, uint16_t y) {
   end_node = XY_TO_NODE(x, y);
 }
+/********************************************************************************/
 
+/********************************************************************************/
 void set_init_node(void) {
   pmap[init_node].prev = NAB;
   pmap[init_node].g_cost = 0;
   pmap[init_node].f_cost = heuristic(init_node);
   pmap[init_node].state = NONE;
 }
+/********************************************************************************/
 
+/********************************************************************************/
 void set_end_node(void) { 
   pmap[end_node].prev = NAB;
   pmap[end_node].g_cost = NCB;
   pmap[end_node].f_cost = NCB;
   pmap[end_node].state = NONE;
 }
+/********************************************************************************/
 
-// Obavezno free da se uradi nakon provere
+/********************************************************************************/
+int8_t is_obstacle(int16_t node_number) {
+  if (pmap[node_number].element == QUARRY || pmap[node_number].element == CASTLE ||
+      pmap[node_number].element == ROBOT)
+    return 1;
+  else
+    return 0;
+}
+/********************************************************************************/
+
+/********************************************************************************/
 int16_t *get_neighbors(int16_t node_number, int8_t *len) {
   int16_t *neighbors = (int16_t *) malloc(8 * sizeof(int16_t));
 
@@ -70,15 +89,9 @@ int16_t *get_neighbors(int16_t node_number, int8_t *len) {
 
   return neighbors;
 }
+/********************************************************************************/
 
-int8_t is_obstacle(int16_t node_number) {
-  if (pmap[node_number].element == QUARRY || pmap[node_number].element == CASTLE ||
-      pmap[node_number].element == ROBOT)
-    return 1;
-  else
-    return 0;
-}
-
+/********************************************************************************/
 uint16_t heuristic(int16_t node_number) {
   register uint16_t dx, dy;
   register uint16_t xy_node[2], xy_goal[2];
@@ -91,7 +104,9 @@ uint16_t heuristic(int16_t node_number) {
 
   return D * (dx + dy) + (D2 - 2 * D) * MIN(dx, dy);
 }
+/********************************************************************************/
 
+/********************************************************************************/
 uint16_t calculate_g_value(int16_t node_number, int16_t prev_number) {
   uint8_t node_row = node_number / ROW_SIZE;
   uint8_t node_col = node_number % ROW_SIZE;
@@ -104,7 +119,9 @@ uint16_t calculate_g_value(int16_t node_number, int16_t prev_number) {
   else
     return pmap[prev_number].g_cost + D;
 }
+/********************************************************************************/
 
+/********************************************************************************/
 void revert_state(void) {
   for (int16_t i = MAP_SIZE - 1; i >= 0; --i) {
     pmap[i].state = NONE;
@@ -112,8 +129,10 @@ void revert_state(void) {
     pmap[i].f_cost = NCB;
     pmap[i].g_cost = NCB;
   }
-}
+} 
+/********************************************************************************/
 
+/********************************************************************************/
 int16_t path_find(void)
 {
   PriorityQueue open;
@@ -136,7 +155,6 @@ int16_t path_find(void)
   if (is_obstacle(init_node) || is_obstacle(end_node))
     return INVALID_NODE;
 
-
   pmap[init_node].state = OPEN;  
   enqueue(&open, init_node);
 
@@ -147,14 +165,10 @@ int16_t path_find(void)
     if (current == init_node)
       pmap[current].g_cost = 0;
 
-    //ESP_LOGI(TAG_PF, "Node num check 0: %d", current);
-    
     closed[cl_size++] = current;
     closed = (int16_t *) realloc(closed, (cl_size + 1) * sizeof(int16_t));
     if (closed == NULL)
       ESP_LOGE(TAG_PF, "path_find: reallocation fail");
-    
-    //ESP_LOGI(TAG_PF, "Node num check 1: %d ", current.num);
 
     if (current == end_node) {
       if (current == init_node)
@@ -164,9 +178,6 @@ int16_t path_find(void)
   
     neighbors = get_neighbors(current, &nb_size);
 
-    //ESP_LOGI(TAG_PF, "Node num check 2: %d ", current.num);
-
-    //printf("Enqueued: \n");
     for (--nb_size; nb_size >= 0; --nb_size) {
 
       if (pmap[neighbors[nb_size]].state == CLOSED || is_obstacle(neighbors[nb_size])) {
@@ -177,14 +188,14 @@ int16_t path_find(void)
     
       if (cost < pmap[neighbors[nb_size]].g_cost || pmap[neighbors[nb_size]].state != OPEN) {
         pmap[neighbors[nb_size]].g_cost = cost;
+#ifndef CONFIG_ADD_INFLATION
         pmap[neighbors[nb_size]].f_cost = cost + (int16_t) round(1.05 * heuristic(neighbors[nb_size]));
+#else
+        pmap[neighbors[nb_size]].f_cost = cost + (int16_t) round(1.05 * heuristic(neighbors[nb_size])) + pinf[neighbors[nb_size]];
+#endif
         pmap[neighbors[nb_size]].state = OPEN;
         enqueue(&open, neighbors[nb_size]);
         pmap[neighbors[nb_size]].prev = current;
-        //printf("%d %d %d %d\n", neighbors[nb_size],
-                              //pmap[neighbors[nb_size]].f_cost,
-                              //pmap[neighbors[nb_size]].g_cost,
-                              //pmap[neighbors[nb_size]].prev);
       }
     }
 
@@ -200,9 +211,10 @@ int16_t path_find(void)
     return pmap[end_node].prev;
   else
     return PATH_NOT_FOUND;
-
 }
+/********************************************************************************/
 
+/********************************************************************************/
 int16_t *reconstruct_path(int16_t *len) {
   int16_t *path, temp = 0, k = 0;
 
@@ -225,5 +237,5 @@ int16_t *reconstruct_path(int16_t *len) {
   *len = k;
 
   return path;
-
 }
+/********************************************************************************/
