@@ -1,0 +1,33 @@
+menu "Path Finder Configuration"
+
+  config START_NODE_NUMBER
+    int "Set starting node of the path"
+    default 0
+    help
+      Set the starting node of the path at the match beginning
+
+  config  END_NODE_NUMBER
+    int "Set end node of the PATH"
+    default 0
+    help
+      Set the ending node of the path at the match beginning
+
+  config ADD_INFLATION
+    bool "Add inflation layer to pathfinding"
+    default n
+    help
+      Adds inflation to nodes close to obstacles
+  
+  config INFLATION_DEPTH
+    int "Choose number of inflated nodes"
+    default 2
+    help
+      Number of nodes close to obstacles to be inflated
+
+  config INFLATION_STEP
+    int "F cost to be added per step"
+    default 10
+    help
+      Number of immaginate step costs to be added to cost
+  
+endmenu
