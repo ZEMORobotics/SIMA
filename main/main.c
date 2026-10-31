@@ -3,10 +3,10 @@
 #include <stdlib.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "tmc2208.h"
 #include "map.h"
 #include "path_finder.h"
 #include "inflation_layer.h"
+#include "tmc2208_uart_util.h"
 
 void app_main(void)
 {
@@ -27,6 +27,29 @@ void app_main(void)
             printf("\n");
     }
     
+    if (tmc2208_uart_init(L_DRIVER_UART) == ESP_OK)
+        printf("L_DRIVER uart init success\n");
+    if (tmc2208_uart_init(R_DRIVER_UART) == ESP_OK)
+        printf("R_DRIVER uart init success\n");
+
+    uint32_t recv = 0;
+
+    if (tmc2208_uart_read(L_DRIVER_UART, 0x70, &recv) == ESP_OK) {
+        printf("Read successful! You've read: %lx\n", recv);
+    } else
+        printf("Read error!\n");
+    if (tmc2208_uart_read(R_DRIVER_UART, 0x70, &recv) == ESP_OK) {
+        printf("Read successful! You've read: %lx\n", recv);
+    } else
+        printf("Read error!\n");
+
+    if (tmc2208_uart_send(L_DRIVER_UART, 0x70, &recv, 1) == ESP_OK) {
+        printf("Write succeded! Now read.\n");
+        if (tmc2208_uart_read(L_DRIVER_UART, 0x70, &recv) == ESP_OK) {
+            printf("Read successful! You've read: %lx\n", recv);
+        } else
+            printf("Read error!\n");
+    }
 
     srand(time(0));
     while (1)
