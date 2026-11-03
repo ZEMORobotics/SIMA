@@ -6,7 +6,7 @@
 #include "map.h"
 #include "path_finder.h"
 #include "inflation_layer.h"
-#include "tmc2208_uart_util.h"
+#include "stepper_driver_setup.h"
 
 void app_main(void)
 {
@@ -26,30 +26,25 @@ void app_main(void)
         if (!(i % ROW_SIZE))
             printf("\n");
     }
-    
-    if (tmc2208_uart_init(L_DRIVER_UART) == ESP_OK)
-        printf("L_DRIVER uart init success\n");
-    if (tmc2208_uart_init(R_DRIVER_UART) == ESP_OK)
-        printf("R_DRIVER uart init success\n");
 
-    uint32_t recv = 0;
+    stepper_driver_t *driver_L_handle, *driver_R_handle;
 
-    if (tmc2208_uart_read(L_DRIVER_UART, 0x70, &recv) == ESP_OK) {
-        printf("Read successful! You've read: %lx\n", recv);
-    } else
-        printf("Read error!\n");
-    if (tmc2208_uart_read(R_DRIVER_UART, 0x70, &recv) == ESP_OK) {
-        printf("Read successful! You've read: %lx\n", recv);
-    } else
-        printf("Read error!\n");
+    create_driver(&driver_L_handle, &driver_R_handle);
 
-    if (tmc2208_uart_send(L_DRIVER_UART, 0x70, &recv, 1) == ESP_OK) {
-        printf("Write succeded! Now read.\n");
-        if (tmc2208_uart_read(L_DRIVER_UART, 0x70, &recv) == ESP_OK) {
-            printf("Read successful! You've read: %lx\n", recv);
-        } else
-            printf("Read error!\n");
-    }
+    //stepper_driver_init(driver_L_handle);
+    //stepper_driver_init(driver_R_handle);
+    if (setup_driver(driver_L_handle) == ESP_OK)
+        printf("OK bajo imamo nesto!\n");
+    else
+        printf("Vise srece drugi put\n");
+
+    stepper_driver_dump_register_pwmconf(driver_L_handle);
+    stepper_driver_dump_register_gconf(driver_L_handle);
+    //stepper_driver_set_pwm_reg(driver_L_handle, 0x01);
+    //stepper_driver_dump_register_pwmconf(driver_L_handle);
+    //stepper_driver_dump_register_chopconf(driver_R_handle);
+
+
 
     srand(time(0));
     while (1)
