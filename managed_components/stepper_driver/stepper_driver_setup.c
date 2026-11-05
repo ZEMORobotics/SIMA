@@ -49,13 +49,13 @@ esp_err_t create_driver(stepper_driver_t **L_driver_handle, stepper_driver_t **R
 esp_err_t setup_driver(stepper_driver_t *stepper_handle) {
 
   stepper_driver_set_toff(stepper_handle, T_OFF);
-  stepper_driver_set_microsteps_per_step(stepper_handle, MICROSTEPS_16);
+  stepper_driver_set_microsteps_per_step(stepper_handle, MICROSTEPS);
   stepper_driver_enable_pwm_autoscale(stepper_handle);
   stepper_driver_set_current(stepper_handle, I_RUN, I_HOLD);
   stepper_driver_set_iholdddelay(stepper_handle, I_HOLD_DELAY);
   stepper_driver_set_tpowerdown(stepper_handle, T_POWER_DOWN);
 
-  uint8_t ifcnt = stepper_driver_read_register_ifcnt(stepper_handle);
+  uint8_t ifcnt = (uint8_t) stepper_driver_read_register_ifcnt(stepper_handle);
   uint8_t version = (uint8_t) (stepper_driver_read_register_ioin(stepper_handle) >> 24);
 
   if (ifcnt > 0 && version == 0x20)

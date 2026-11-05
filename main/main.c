@@ -29,17 +29,18 @@ void app_main(void)
 
     stepper_driver_t *driver_L_handle, *driver_R_handle;
 
-    create_driver(&driver_L_handle, &driver_R_handle);
+    if (create_driver(&driver_L_handle, &driver_R_handle) != ESP_OK) {
+        printf("Driver creation failed!\n");
+    }
 
-    //stepper_driver_init(driver_L_handle);
-    //stepper_driver_init(driver_R_handle);
     if (setup_driver(driver_L_handle) == ESP_OK)
         printf("OK bajo imamo nesto!\n");
     else
         printf("Vise srece drugi put\n");
-
+    
     stepper_driver_dump_register_pwmconf(driver_L_handle);
-    stepper_driver_dump_register_gconf(driver_L_handle);
+    stepper_driver_dump_register_chopconf(driver_L_handle);
+
     //stepper_driver_set_pwm_reg(driver_L_handle, 0x01);
     //stepper_driver_dump_register_pwmconf(driver_L_handle);
     //stepper_driver_dump_register_chopconf(driver_R_handle);

@@ -625,56 +625,72 @@ uint32_t tmc2208_read_register_gstat(stepper_driver_t *handle)
 {
     stepper_driver_tmc2208_t *tmc2208 = __containerof(handle, stepper_driver_tmc2208_t, parent);
 
-    return read_register(tmc2208, (tmc2208_datagram_t *)&tmc2208->gstat); 
+    read_register(tmc2208, (tmc2208_datagram_t *)&tmc2208->gstat); 
+
+    return tmc2208->gstat.reg.value;
 }
 
 uint32_t tmc2208_read_register_tstep(stepper_driver_t *handle)
 {
     stepper_driver_tmc2208_t *tmc2208 = __containerof(handle, stepper_driver_tmc2208_t, parent);
 
-    return read_register(tmc2208, (tmc2208_datagram_t *)&tmc2208->tstep); 
+    read_register(tmc2208, (tmc2208_datagram_t *)&tmc2208->tstep); 
+
+    return tmc2208->tstep.reg.value;
 }
 
 uint32_t tmc2208_read_register_drv_status(stepper_driver_t *handle)
 {
     stepper_driver_tmc2208_t *tmc2208 = __containerof(handle, stepper_driver_tmc2208_t, parent);
 
-    return read_register(tmc2208, (tmc2208_datagram_t *)&tmc2208->drv_status);
+    read_register(tmc2208, (tmc2208_datagram_t *)&tmc2208->drv_status);
+
+    return tmc2208->drv_status.reg.value;
 }
 
 uint32_t tmc2208_read_register_ioin(stepper_driver_t *handle)
 {
     stepper_driver_tmc2208_t *tmc2208 = __containerof(handle, stepper_driver_tmc2208_t, parent);
 
-    return read_register(tmc2208, (tmc2208_datagram_t *)&tmc2208->ioin);
+    read_register(tmc2208, (tmc2208_datagram_t *)&tmc2208->ioin);
+
+    return tmc2208->ioin.reg.value;
 }
 
 uint32_t tmc2208_read_register_otp_read(stepper_driver_t *handle)
 {
     stepper_driver_tmc2208_t *tmc2208 = __containerof(handle, stepper_driver_tmc2208_t, parent);
 
-    return read_register(tmc2208, (tmc2208_datagram_t *)&tmc2208->otp_read);
+    read_register(tmc2208, (tmc2208_datagram_t *)&tmc2208->otp_read);
+
+    return tmc2208->otp_prog.reg.value;
 }
 
 uint32_t tmc2208_read_register_mscntd(stepper_driver_t *handle)
 {
     stepper_driver_tmc2208_t *tmc2208 = __containerof(handle, stepper_driver_tmc2208_t, parent);
 
-    return read_register(tmc2208, (tmc2208_datagram_t *)&tmc2208->mscnt);
+    read_register(tmc2208, (tmc2208_datagram_t *)&tmc2208->mscnt);
+
+    return tmc2208->mscnt.reg.value;
 }
 
 uint32_t tmc2208_read_register_mscuract(stepper_driver_t *handle)
 {
     stepper_driver_tmc2208_t *tmc2208 = __containerof(handle, stepper_driver_tmc2208_t, parent);
 
-    return read_register(tmc2208, (tmc2208_datagram_t *)&tmc2208->mscuract);
+    read_register(tmc2208, (tmc2208_datagram_t *)&tmc2208->mscuract);
+
+    return tmc2208->mscuract.reg.value;
 }
 
 uint32_t tmc2208_read_register_ifcnt(stepper_driver_t *handle)
 {
     stepper_driver_tmc2208_t *tmc2208 = __containerof(handle, stepper_driver_tmc2208_t, parent);
 
-    return read_register(tmc2208, (tmc2208_datagram_t *)&tmc2208->ifcnt);
+    read_register(tmc2208, (tmc2208_datagram_t *)&tmc2208->ifcnt);
+
+    return tmc2208->ifcnt.reg.value;
 }
 
 // |================================================================================================ |
