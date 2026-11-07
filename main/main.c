@@ -7,6 +7,7 @@
 #include "path_finder.h"
 #include "inflation_layer.h"
 #include "stepper_driver_setup.h"
+#include "move_util.h"
 
 void app_main(void)
 {
@@ -27,25 +28,40 @@ void app_main(void)
             printf("\n");
     }
 
+    tmc2208_motor_config_t motor_L = {
+        .resolution_hz = 500000,
+        .start_freq_hz = 400,
+        .end_freq_hz = 400,
+        .accel_samples = 1000,
+        .uniform_speed_hz = 2000,
+        .decel_samples = 1000
+    };
+
     stepper_driver_t *driver_L_handle, *driver_R_handle;
 
     if (create_driver(&driver_L_handle, &driver_R_handle) != ESP_OK) {
         printf("Driver creation failed!\n");
     }
 
-    if (setup_driver(driver_L_handle) == ESP_OK)
+    if (setup_driver(driver_L_handle) == ESP_OK) {
         printf("OK bajo imamo nesto!\n");
+        if (tmc2208_move_disable(driver_L_handle, &motor_L) == ESP_OK)
+        printf("Drajver onesposobljen\n");
+        stepper_driver_direction(driver_L_handle, 1);
+        //if (tmc2208_move_enable(driver_L_handle, &motor_L) == ESP_OK) {
+            //vTaskDelay(pdMS_TO_TICKS(1000));
+            tmc2208_move_steps(driver_L_handle, &motor_L, 6400, false, false);
+            tmc2208_move_steps(driver_L_handle, &motor_L, -6400, false, false);
+            //stepper_driver_steps(driver_L_handle, 100000, 100);
+            //stepper_driver_direction(driver_L_handle, 0);
+            //stepper_driver_steps(driver_L_handle, 100000, 100);
+        //}
+    }
     else
         printf("Vise srece drugi put\n");
     
     stepper_driver_dump_register_pwmconf(driver_L_handle);
     stepper_driver_dump_register_chopconf(driver_L_handle);
-
-    //stepper_driver_set_pwm_reg(driver_L_handle, 0x01);
-    //stepper_driver_dump_register_pwmconf(driver_L_handle);
-    //stepper_driver_dump_register_chopconf(driver_R_handle);
-
-
 
     srand(time(0));
     while (1)
@@ -70,6 +86,12 @@ void app_main(void)
 
                 free(path);
                 path = NULL;
+
+                //if (tmc2208_move_enable(driver_L_handle, &motor_L) == ESP_OK) {
+                    //vTaskDelay(pdMS_TO_TICKS(1000));
+                    tmc2208_move_steps(driver_L_handle, &motor_L, 4400, true, true);
+                    tmc2208_move_steps(driver_L_handle, &motor_L, -4400, true, true);
+                //}
             }
         }
         else

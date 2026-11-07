@@ -43,6 +43,9 @@ esp_err_t create_driver(stepper_driver_t **L_driver_handle, stepper_driver_t **R
     return ESP_FAIL;
   }
 
+  stepper_driver_clear_gstat(*L_driver_handle);
+  //stepper_driver_clear_gstat(*R_driver_handle);
+
   return ESP_OK;
 }
 

@@ -91,7 +91,7 @@ esp_err_t tmc2208_init(stepper_driver_t *handle)
       .mem_block_symbols = 64,
 #endif
       .mem_block_symbols = RMT_BLOCK_SIZE,     
-      .trans_queue_depth = 4,
+      .trans_queue_depth = 10,
     };
     ESP_ERROR_CHECK(rmt_new_tx_channel(&tx_chan_config, &tmc2208->rmt_channel));
     ESP_ERROR_CHECK(rmt_enable(tmc2208->rmt_channel));
@@ -160,7 +160,7 @@ esp_err_t tmc2208_enable(stepper_driver_t *handle)
 {
     esp_err_t ret = ESP_OK;
     stepper_driver_tmc2208_t *tmc2208 = __containerof(handle, stepper_driver_tmc2208_t, parent);
-
+    
     gpio_set_level(tmc2208->driver_config.enable_pin, 0);
 
     return ret;
