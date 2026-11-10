@@ -75,20 +75,41 @@ static esp_err_t tmc2208_decelerate(stepper_driver_t *handle, tmc2208_motor_conf
 
 esp_err_t tmc2208_uniform_move_steps(stepper_driver_t *handle, tmc2208_motor_config_t *motor_config, int32_t steps)
 {
+  
   stepper_driver_tmc2208_t *tmc2208 = __containerof(handle, stepper_driver_tmc2208_t, parent);
 
-  rmt_transmit_config_t tx_config = {
-      .loop_count = 0,
-  };
+  rmt_symbol_word_t *items = (rmt_symbol_word_t*) pvPortMalloc(steps * sizeof(rmt_symbol_word_t));
 
-  // uniform phase
-  tx_config.loop_count = steps;
-  // set steps uniform
-  ESP_ERROR_CHECK(rmt_transmit(tmc2208->rmt_channel, tmc2208->rmt_encoder, &motor_config->uniform_speed_hz, sizeof(motor_config->uniform_speed_hz), &tx_config));
-  // wait all transactions finished
+  if (!items) {
+      ESP_LOGE(TAG, "Failed to allocate memory for RMT items");
+      return ESP_ERR_NO_MEM;
+  }
+
+  uint16_t signal_duration = motor_config->resolution_hz / motor_config->uniform_speed_hz / 2;
+
+  for (uint32_t i = 0; i < steps; i++) {
+      items[i].level0 = 1;
+      items[i].duration0 = signal_duration;
+      items[i].level1 = 0;
+      items[i].duration1 = signal_duration;
+  }
+    
+  rmt_transmit_config_t txConfig = {};
+  txConfig.loop_count = 0;
+
+  ESP_ERROR_CHECK(rmt_transmit(
+        tmc2208->rmt_channel,
+        tmc2208->rmt_encoder,
+        items,
+        steps * sizeof(rmt_symbol_word_t),
+        &txConfig
+    ));
+
+  vPortFree(items);
   ESP_ERROR_CHECK(rmt_tx_wait_all_done(tmc2208->rmt_channel, -1));
-
+  
   return ESP_OK;
+  
 }
 
 esp_err_t tmc2208_move_steps(stepper_driver_t *handle, tmc2208_motor_config_t *motor_config, int32_t steps, bool accel, bool decel)
@@ -133,7 +154,7 @@ esp_err_t tmc2208_move_enable(stepper_driver_t *handle, tmc2208_motor_config_t *
 
   // Set direction
   stepper_driver_direction(handle, TMC2208_DIR_CW);
-  ESP_ERROR_CHECK(create_uniform_motor_encoder(motor_config, &tmc2208->rmt_encoder));
+  //ESP_ERROR_CHECK(create_uniform_motor_encoder(motor_config, &tmc2208->rmt_encoder));
   ESP_ERROR_CHECK(rmt_enable(tmc2208->rmt_channel));
   return ESP_OK;
 }
@@ -145,5 +166,6 @@ esp_err_t tmc2208_move_disable(stepper_driver_t *handle, tmc2208_motor_config_t 
   // Set enable to 1
   stepper_driver_disable(handle);
   ESP_ERROR_CHECK(rmt_disable(tmc2208->rmt_channel));
+  //ESP_ERROR_CHECK(rmt_del_encoder(tmc2208->rmt_encoder));
   return ESP_OK;
 }

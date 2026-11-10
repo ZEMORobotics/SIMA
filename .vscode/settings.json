@@ -31,7 +31,7 @@
   ],
   "idf.customExtraVars": {
     "IDF_TARGET": "esp32c5",
-    "OPENOCD_USB_ADAPTER_LOCATION": "1-2"
+    "OPENOCD_USB_ADAPTER_LOCATION": "3-2"
   },
   "idf.flashType": "UART",
   "idf.port": "/dev/ttyACM0"

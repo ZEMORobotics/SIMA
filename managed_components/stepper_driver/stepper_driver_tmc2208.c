@@ -94,7 +94,7 @@ esp_err_t tmc2208_init(stepper_driver_t *handle)
       .trans_queue_depth = 10,
     };
     ESP_ERROR_CHECK(rmt_new_tx_channel(&tx_chan_config, &tmc2208->rmt_channel));
-    ESP_ERROR_CHECK(rmt_enable(tmc2208->rmt_channel));
+    //ESP_ERROR_CHECK(rmt_enable(tmc2208->rmt_channel));
 
     ESP_LOGI(TAG, "Creating RMT copy encoder");
     rmt_copy_encoder_config_t encoder_config = {};
