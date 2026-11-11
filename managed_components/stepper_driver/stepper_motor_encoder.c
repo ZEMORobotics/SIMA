@@ -17,16 +17,6 @@ static float convert_to_smooth_freq(uint32_t freq1, uint32_t freq2,
   return smooth_x * (freq2 - freq1) + freq1;
 }
 
-typedef struct {
-  rmt_encoder_t base;
-  rmt_encoder_handle_t copy_encoder;
-  uint32_t sample_points;
-  struct {
-    uint32_t is_accel_curve : 1;
-  } flags;
-  rmt_symbol_word_t curve_table[];
-} rmt_stepper_curve_encoder_t;
-
 static size_t rmt_encode_stepper_motor_curve(rmt_encoder_t *encoder,
                                              rmt_channel_handle_t channel,
                                              const void *primary_data,

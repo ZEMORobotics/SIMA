@@ -36,7 +36,7 @@ void app_main(void)
         .start_freq_hz = 100,
         .end_freq_hz = 100,
         .accel_samples = 1000,
-        .uniform_speed_hz = 5000,
+        .uniform_speed_hz = 2500,
         .decel_samples = 1000,
     };
 
@@ -48,17 +48,6 @@ void app_main(void)
 
     if (setup_driver(driver_L_handle) == ESP_OK) {
         printf("OK bajo imamo nesto!\n");
-        //if (tmc2208_move_disable(driver_L_handle, &motor_L) == ESP_OK)
-        //printf("Drajver onesposobljen\n");
-        //stepper_driver_direction(driver_L_handle, 1);
-        //if (tmc2208_move_enable(driver_L_handle, &motor_L) == ESP_OK) {
-            //vTaskDelay(pdMS_TO_TICKS(1000));
-            //tmc2208_move_steps(driver_L_handle, &motor_L, 6400, false, false);
-            //tmc2208_move_steps(driver_L_handle, &motor_L, -6400, false, false);
-            //stepper_driver_steps(driver_L_handle, 100000, 100);
-            //stepper_driver_direction(driver_L_handle, 0);
-            //stepper_driver_steps(driver_L_handle, 100000, 100);
-        //}
     }
     else
         printf("Vise srece drugi put\n");
@@ -87,7 +76,7 @@ void app_main(void)
                 //for (--len; len >= 0; --len)
                     //printf("%d\n", path[len]);
 
-                //free(path);
+                free(path);
                 path = NULL;
 
                 //ESP_LOGI(TAG, "Odmah pre ponovnog kretanja");

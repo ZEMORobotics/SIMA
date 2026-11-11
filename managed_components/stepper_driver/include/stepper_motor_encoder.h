@@ -22,6 +22,16 @@ typedef struct {
     uint32_t end_freq_hz;   // End frequency on the curve, in Hz
 } stepper_motor_curve_encoder_config_t;
 
+typedef struct {
+  rmt_encoder_t base;
+  rmt_encoder_handle_t copy_encoder;
+  uint32_t sample_points;
+  struct {
+    uint32_t is_accel_curve : 1;
+  } flags;
+  rmt_symbol_word_t curve_table[];
+} rmt_stepper_curve_encoder_t;
+
 /**
  * @brief Stepper motor uniform encoder configuration
  */

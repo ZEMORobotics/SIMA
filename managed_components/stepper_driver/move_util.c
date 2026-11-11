@@ -44,6 +44,8 @@ static esp_err_t tmc2208_accelerate(stepper_driver_t *handle, tmc2208_motor_conf
   // wait all transactions finished
   ESP_ERROR_CHECK(rmt_tx_wait_all_done(tmc2208->rmt_channel, -1));
 
+  accel_motor_encoder->del(accel_motor_encoder);
+
   return ESP_OK;
 }
 
@@ -69,6 +71,8 @@ static esp_err_t tmc2208_decelerate(stepper_driver_t *handle, tmc2208_motor_conf
   ESP_ERROR_CHECK(rmt_transmit(tmc2208->rmt_channel, decel_motor_encoder, &motor_config->decel_samples, sizeof(motor_config->decel_samples), &tx_config));
   // wait all transactions finished
   ESP_ERROR_CHECK(rmt_tx_wait_all_done(tmc2208->rmt_channel, -1));
+  
+  decel_motor_encoder->del(decel_motor_encoder);
 
   return ESP_OK;
 }
@@ -78,7 +82,7 @@ esp_err_t tmc2208_uniform_move_steps(stepper_driver_t *handle, tmc2208_motor_con
   
   stepper_driver_tmc2208_t *tmc2208 = __containerof(handle, stepper_driver_tmc2208_t, parent);
 
-  rmt_symbol_word_t *items = (rmt_symbol_word_t*) pvPortMalloc(steps * sizeof(rmt_symbol_word_t));
+  rmt_symbol_word_t *items = (rmt_symbol_word_t*) malloc(steps * sizeof(rmt_symbol_word_t));
 
   if (!items) {
       ESP_LOGE(TAG, "Failed to allocate memory for RMT items");
@@ -105,7 +109,7 @@ esp_err_t tmc2208_uniform_move_steps(stepper_driver_t *handle, tmc2208_motor_con
         &txConfig
     ));
 
-  vPortFree(items);
+  free(items);
   ESP_ERROR_CHECK(rmt_tx_wait_all_done(tmc2208->rmt_channel, -1));
   
   return ESP_OK;
