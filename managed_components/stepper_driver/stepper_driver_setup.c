@@ -8,7 +8,12 @@
 #define I_HOLD_DELAY 6 // ms
 #define T_POWER_DOWN 20 // ms
 
-esp_err_t create_driver(stepper_driver_t **L_driver_handle, stepper_driver_t **R_driver_handle) {
+#define MOTORS_NUM 2
+
+stepper_driver_t *driver_L_handle = NULL, *driver_R_handle = NULL;
+rmt_sync_manager_handle_t motor_sync_manager = NULL;
+
+esp_err_t create_driver(void) {
 
   stepper_driver_tmc2208_conf_t driver_L_conf = {
     .uart_port = UART_NUM_1,
@@ -30,21 +35,21 @@ esp_err_t create_driver(stepper_driver_t **L_driver_handle, stepper_driver_t **R
       .enable_pin = GPIO_NUM_5
   };
 
-  *L_driver_handle = stepper_driver_new_tmc2208(&driver_L_conf);
-  *R_driver_handle = stepper_driver_new_tmc2208(&driver_R_conf);
+  driver_L_handle = stepper_driver_new_tmc2208(&driver_L_conf);
+  driver_R_handle = stepper_driver_new_tmc2208(&driver_R_conf);
 
-  if (*L_driver_handle == NULL || *R_driver_handle == NULL) {
+  if (driver_L_handle == NULL || driver_R_handle == NULL) {
     ESP_LOGE(TAG, "Error creating stepper driver handles");
     return ESP_FAIL;
   }
 
-  if (stepper_driver_init(*L_driver_handle) != ESP_OK || stepper_driver_init(*R_driver_handle) != ESP_OK) {
+  if (stepper_driver_init(driver_L_handle) != ESP_OK || stepper_driver_init(driver_R_handle) != ESP_OK) {
     ESP_LOGE(TAG, "Error initializing stepper driver handles");
     return ESP_FAIL;
   }
 
-  stepper_driver_clear_gstat(*L_driver_handle);
-  //stepper_driver_clear_gstat(*R_driver_handle);
+  stepper_driver_clear_gstat(driver_L_handle);
+  stepper_driver_clear_gstat(driver_R_handle);
 
   return ESP_OK;
 }
@@ -65,4 +70,24 @@ esp_err_t setup_driver(stepper_driver_t *stepper_handle) {
     return ESP_OK;
   else
     return ESP_FAIL;
+}
+
+esp_err_t create_sync_manager(void) {
+
+  stepper_driver_tmc2208_t *driver_L_tmc = __containerof(driver_L_handle, stepper_driver_tmc2208_t, parent);
+  stepper_driver_tmc2208_t *driver_R_tmc = __containerof(driver_R_handle, stepper_driver_tmc2208_t, parent);
+
+  rmt_channel_handle_t arr[MOTORS_NUM] = {driver_L_tmc->rmt_channel, driver_R_tmc->rmt_channel};
+
+  rmt_sync_manager_config_t motor_sync_manager_cfg = {
+    .tx_channel_array = arr,
+    .array_size = MOTORS_NUM
+  };
+
+  ESP_ERROR_CHECK(rmt_enable(driver_L_tmc->rmt_channel));
+  ESP_ERROR_CHECK(rmt_enable(driver_R_tmc->rmt_channel));
+
+  ESP_ERROR_CHECK(rmt_new_sync_manager(&motor_sync_manager_cfg, &motor_sync_manager));
+
+  return ESP_OK;
 }

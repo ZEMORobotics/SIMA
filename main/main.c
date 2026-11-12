@@ -36,13 +36,11 @@ void app_main(void)
         .start_freq_hz = 100,
         .end_freq_hz = 100,
         .accel_samples = 1000,
-        .uniform_speed_hz = 2500,
+        .uniform_speed_hz = 2000,
         .decel_samples = 1000,
     };
 
-    stepper_driver_t *driver_L_handle, *driver_R_handle;
-
-    if (create_driver(&driver_L_handle, &driver_R_handle) != ESP_OK) {
+    if (create_driver() != ESP_OK) {
         printf("Driver creation failed!\n");
     }
 
@@ -51,6 +49,9 @@ void app_main(void)
     }
     else
         printf("Vise srece drugi put\n");
+
+    if (create_sync_manager() != ESP_OK) 
+        printf("Error creating sync\n");
     
     stepper_driver_dump_register_pwmconf(driver_L_handle);
     stepper_driver_dump_register_chopconf(driver_L_handle);
@@ -82,9 +83,11 @@ void app_main(void)
                 //ESP_LOGI(TAG, "Odmah pre ponovnog kretanja");
                 //if (tmc2208_move_enable(driver_L_handle, &motor_L) == ESP_OK) {
                     //vTaskDelay(pdMS_TO_TICKS(1000));
-                    tmc2208_move_steps(driver_L_handle, &motor_L, 4400, true, true);
-                    tmc2208_move_steps(driver_L_handle, &motor_L, -4400, true, true);
-                    //tmc2208_move_steps(driver_L_handle, &motor_L, 4400, false, false);
+                    //tmc2208_move_steps(driver_L_handle, &motor_L, 4400, true, true);
+                    //tmc2208_move_steps(driver_L_handle, &motor_L, -4400, true, true);
+                    tmc2208_move_sync(&motor_L, 4400, -4400, true, true);
+                    //tmc2208_uniform_sync_move(&motor_L, 4400, 4400);
+                    //tmc2208_move_steps(driver_L_handle, &motor_L, 4400, true, true);
                 //}
             }
         }

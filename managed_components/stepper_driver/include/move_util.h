@@ -25,9 +25,11 @@ typedef struct {
     uint32_t max_freq_hz;                /**< Maximum frequency in Hz. */
 } tmc2208_motor_config_t;
 
-esp_err_t tmc2208_move_enable(stepper_driver_t *handle, tmc2208_motor_config_t *motor_config);
-esp_err_t tmc2208_move_disable(stepper_driver_t *handle, tmc2208_motor_config_t *motor_config);
+esp_err_t tmc2208_move_enable(stepper_driver_t *handle, bool is_sync);
+esp_err_t tmc2208_move_disable(stepper_driver_t *handle, bool is_sync);
 esp_err_t tmc2208_move_steps(stepper_driver_t *handle, tmc2208_motor_config_t *motor_config, int32_t steps, bool accel, bool decel);
 esp_err_t tmc2208_uniform_move_steps(stepper_driver_t *handle, tmc2208_motor_config_t *motor_config, int32_t steps);
+esp_err_t tmc2208_uniform_sync_move(tmc2208_motor_config_t *motor_config, int32_t steps_L, int32_t steps_R);
+esp_err_t tmc2208_move_sync(tmc2208_motor_config_t *motor_config, int32_t steps_L, int32_t steps_R, bool accel, bool decel);
 
 #endif // MOVE_UTIL_H

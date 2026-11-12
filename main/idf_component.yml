@@ -15,4 +15,3 @@ dependencies:
   #   # All dependencies of `main` are public by default.
   #   public: true
   espressif/coap: ^4.3.4~3
-  pedrominatel/tmc2208: ^0.1.0
