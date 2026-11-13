@@ -7,7 +7,7 @@
 #include "path_finder.h"
 #include "inflation_layer.h"
 #include "stepper_driver_setup.h"
-#include "move_util.h"
+#include "move.h"
 #include "esp_log.h"
 
 #define TAG "main"
@@ -31,14 +31,6 @@ void app_main(void)
             printf("\n");
     }
     */
-    tmc2208_motor_config_t motor_L = {
-        .resolution_hz = 500000,
-        .start_freq_hz = 100,
-        .end_freq_hz = 100,
-        .accel_samples = 1000,
-        .uniform_speed_hz = 2000,
-        .decel_samples = 1000,
-    };
 
     if (create_driver() != ESP_OK) {
         printf("Driver creation failed!\n");
@@ -81,13 +73,15 @@ void app_main(void)
                 path = NULL;
 
                 //ESP_LOGI(TAG, "Odmah pre ponovnog kretanja");
-                //if (tmc2208_move_enable(driver_L_handle, &motor_L) == ESP_OK) {
+                //if (tmc2208_move_enable(driver_L_handle, &motor_cfg) == ESP_OK) {
                     //vTaskDelay(pdMS_TO_TICKS(1000));
-                    //tmc2208_move_steps(driver_L_handle, &motor_L, 4400, true, true);
-                    //tmc2208_move_steps(driver_L_handle, &motor_L, -4400, true, true);
-                    tmc2208_move_sync(&motor_L, 4400, -4400, true, true);
-                    //tmc2208_uniform_sync_move(&motor_L, 4400, 4400);
-                    //tmc2208_move_steps(driver_L_handle, &motor_L, 4400, true, true);
+                    //tmc2208_move_steps(driver_L_handle, &motor_cfg, 4400, true, true);
+                    //tmc2208_move_steps(driver_L_handle, &motor_cfg, -4400, true, true);
+                    //tmc2208_move_sync(&motor_cfg, 4400, -4400, true, true);
+                    translate_mm(1000, 1000, true, false);
+                    rotate_deg(-90, false, false);
+                    //tmc2208_uniform_sync_move(&motor_cfg, 4400, 4400);
+                    //tmc2208_move_steps(driver_L_handle, &motor_cfg, 4400, true, true);
                 //}
             }
         }

@@ -9,6 +9,15 @@
 
 static const char *TAG = "MOVE_UTIL";
 
+tmc2208_motor_config_t motor_cfg = {
+        .resolution_hz = 500000,
+        .start_freq_hz = 100,
+        .end_freq_hz = 100,
+        .accel_samples = 1000,
+        .uniform_speed_hz = 2000,
+        .decel_samples = 1000,
+};
+
 static esp_err_t create_uniform_motor_encoder(const tmc2208_motor_config_t *motor_config, rmt_encoder_handle_t *uniform_motor_encoder)
 {
   stepper_motor_uniform_encoder_config_t uniform_encoder_config = {
@@ -238,7 +247,8 @@ esp_err_t tmc2208_uniform_sync_move(tmc2208_motor_config_t *motor_config, int32_
         &txConfig
     );
 
-  free(items_L), free(items_R);
+  free(items_L); 
+  free(items_R);
   
   ESP_ERROR_CHECK(rmt_tx_wait_all_done(driver_R_tmc->rmt_channel, -1));
   ESP_ERROR_CHECK(rmt_sync_reset(motor_sync_manager));
@@ -326,9 +336,9 @@ esp_err_t tmc2208_move_enable(stepper_driver_t *handle, bool is_sync)
 
   // Set direction
   stepper_driver_direction(handle, TMC2208_DIR_CW);
-  //ESP_ERROR_CHECK(create_uniform_motor_encoder(motor_config, &tmc2208->rmt_encoder));
   if (!is_sync)
     ESP_ERROR_CHECK(rmt_enable(tmc2208->rmt_channel));
+
   return ESP_OK;
 }
 
@@ -340,6 +350,6 @@ esp_err_t tmc2208_move_disable(stepper_driver_t *handle, bool is_sync)
   stepper_driver_disable(handle);
   if (!is_sync)
     ESP_ERROR_CHECK(rmt_disable(tmc2208->rmt_channel));
-  //ESP_ERROR_CHECK(rmt_del_encoder(tmc2208->rmt_encoder));
+
   return ESP_OK;
 }
