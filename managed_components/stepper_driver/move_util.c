@@ -8,6 +8,7 @@
 #include "stepper_motor_encoder.h"
 
 #define RAMP_PERCENT 0.2
+#define RAMP_MAX_SAMPLES 1000
 
 static const char *TAG = "MOVE_UTIL";
 
@@ -15,9 +16,9 @@ tmc2208_motor_config_t motor_cfg = {
         .resolution_hz = 500000,
         .start_freq_hz = 100,
         .end_freq_hz = 100,
-        .accel_samples = 1000,
+        .accel_samples = RAMP_MAX_SAMPLES,
         .uniform_speed_hz = 2000,
-        .decel_samples = 1000,
+        .decel_samples = RAMP_MAX_SAMPLES,
 };
 
 static esp_err_t create_uniform_motor_encoder(const tmc2208_motor_config_t *motor_config, rmt_encoder_handle_t *uniform_motor_encoder)
@@ -312,13 +313,16 @@ esp_err_t tmc2208_move_sync(tmc2208_motor_config_t *motor_config, int32_t steps_
     steps_R = steps_R * -1;
   }
 
+  uint16_t ramp_samples = (uint16_t) roundf(RAMP_PERCENT * steps_L);
+  if (ramp_samples > RAMP_MAX_SAMPLES) ramp_samples = RAMP_MAX_SAMPLES;
+
   if (accel) {
-    motor_cfg.accel_samples = (uint32_t) roundf(RAMP_PERCENT * steps_L);
-    steps_L = steps_R = (int32_t) roundf((1 - RAMP_PERCENT) * steps_L);
+    motor_cfg.accel_samples = ramp_samples;
+    steps_L = steps_R -= ramp_samples;
   }
   if (decel) {
-    motor_cfg.decel_samples = (uint32_t) roundf(RAMP_PERCENT * steps_L);
-    steps_L = steps_R = (int32_t) roundf((1 - RAMP_PERCENT) * steps_L);
+    motor_cfg.decel_samples = ramp_samples;
+    steps_L = steps_R -= ramp_samples; 
   }
 
   if (accel) {
