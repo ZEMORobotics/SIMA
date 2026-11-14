@@ -10,7 +10,7 @@
 
 #define TAG_PF "path_find"
 
-static int16_t init_node = 0, end_node = 0;
+int16_t init_node = 0, end_node = 0;
 
 /********************************************************************************/
 void set_init_num(uint16_t x, uint16_t y) {

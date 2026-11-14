@@ -7,6 +7,8 @@
 #include "stepper_driver_setup.h"
 #include "stepper_motor_encoder.h"
 
+#define RAMP_PERCENT 0.2
+
 static const char *TAG = "MOVE_UTIL";
 
 tmc2208_motor_config_t motor_cfg = {
@@ -308,6 +310,15 @@ esp_err_t tmc2208_move_sync(tmc2208_motor_config_t *motor_config, int32_t steps_
   else {
     stepper_driver_direction(driver_R_handle, TMC2208_DIR_CCW);
     steps_R = steps_R * -1;
+  }
+
+  if (accel) {
+    motor_cfg.accel_samples = (uint32_t) roundf(RAMP_PERCENT * steps_L);
+    steps_L = steps_R = (int32_t) roundf((1 - RAMP_PERCENT) * steps_L);
+  }
+  if (decel) {
+    motor_cfg.decel_samples = (uint32_t) roundf(RAMP_PERCENT * steps_L);
+    steps_L = steps_R = (int32_t) roundf((1 - RAMP_PERCENT) * steps_L);
   }
 
   if (accel) {

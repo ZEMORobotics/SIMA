@@ -6,6 +6,8 @@
 #define PATH_NOT_FOUND -1
 #define INVALID_NODE -2
 
+extern int16_t init_node, end_node;
+
 typedef enum MoveCosts {D = 10, D2 = 14} MoveCosts;
 
 /**

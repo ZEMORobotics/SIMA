@@ -9,6 +9,7 @@
 #include "stepper_driver_setup.h"
 #include "move.h"
 #include "esp_log.h"
+#include "path_follow.h"
 
 #define TAG "main"
 
@@ -78,8 +79,9 @@ void app_main(void)
                     //tmc2208_move_steps(driver_L_handle, &motor_cfg, 4400, true, true);
                     //tmc2208_move_steps(driver_L_handle, &motor_cfg, -4400, true, true);
                     //tmc2208_move_sync(&motor_cfg, 4400, -4400, true, true);
-                    translate_mm(1000, 1000, true, false);
-                    rotate_deg(-90, false, false);
+                    translate_mm(50*M_PI, 50*M_PI, true, true);
+                    //rotate_deg(-90, false, false);
+                    ESP_LOGI(TAG, "MSCNT: %ld", stepper_driver_read_register_mscntd(driver_L_handle));
                     //tmc2208_uniform_sync_move(&motor_cfg, 4400, 4400);
                     //tmc2208_move_steps(driver_L_handle, &motor_cfg, 4400, true, true);
                 //}
